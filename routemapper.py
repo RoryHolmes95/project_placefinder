@@ -71,7 +71,9 @@ def get_union(postcode1, postcode2, transportType, travelTime, auth_key=key):
     ax.plot(coords2.longitude, coords2.latitude)
     if len(intersects) > 0:   
         ax.plot(df3.longitude, df3.latitude, color = 'green')
-    ax.set_title(f'{travelTime} minute {transportType} radius from {postcode1} and {postcode2}. \n We suggest you look for housing in {locality}')
+        ax.set_title(f'{travelTime} minute {transportType} radius from {postcode1} and {postcode2}. \n We suggest you look for housing in {locality}')
+    else:
+        ax.set_title(f'{travelTime} minute {transportType} radius from {postcode1} and {postcode2}. \n There is no area that allow you both to get to work on time, try changing the above parameters')
     ax.set_xlim(-0.2107,-0.0498)
     ax.set_ylim(51.4768,51.5511)
     lims = (-0.2107, -0.0498, 51.4768, 51.5511,)
@@ -85,4 +87,4 @@ def get_union(postcode1, postcode2, transportType, travelTime, auth_key=key):
     plt.show()
         
 
-get_union("W8 6UG", "SW3 4SR", "Walking", 30)
+get_union("W8 6UG", "EC1V 7HP", "Walking", 30)
