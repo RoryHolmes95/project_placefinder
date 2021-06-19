@@ -14,7 +14,7 @@ class Point:
 		self.y = y
 
 def get_union(auth_key=key):
-    url = f'https://dev.virtualearth.net/REST/v1/Routes/Isochrones?waypoint=51.5065,-0.1660&maxtime=25&timeUnit=minute&travelMode=Walking&key={auth_key}'
+    url = f'https://dev.virtualearth.net/REST/v1/Routes/Isochrones?waypoint=51.563480,-0.184846&maxtime=25&timeUnit=minute&travelMode=Walking&key={auth_key}'
     response = requests.get(url).content
     response = json.loads(response)
     coords = response['resourceSets'][0]['resources'][0]['polygons'][0]['coordinates'][0]
@@ -54,13 +54,15 @@ def get_union(auth_key=key):
         else:
             rows_between = coords2.iloc[intersects2[i]:intersects2[i+1]]
         df3 = df3.append(rows_between)
-    df3 = df3.append(coords2.iloc[intersects2[-1]:intersects2[0]])
+    if len(intersects) > 0:   
+        df3 = df3.append(coords2.iloc[intersects2[-1]:intersects2[0]])
     print (df3.to_string())
     mymap = plt.imread('map11.png')
     fig, ax = plt.subplots(figsize = (8,7))
     ax.plot(coords.longitude, coords.latitude)
     ax.plot(coords2.longitude, coords2.latitude)
-    ax.plot(df3.longitude, df3.latitude, color = 'green')
+    if len(intersects) > 0:   
+        ax.plot(df3.longitude, df3.latitude, color = 'green')
     ax.set_title('25 minute walk radius from Pimlico and Leicester Square')
     ax.set_xlim(-0.2107,-0.0498)
     ax.set_ylim(51.4768,51.5511)
@@ -68,7 +70,10 @@ def get_union(auth_key=key):
     ax.imshow(mymap, extent = lims, aspect= 'equal')
     plt.fill(coords.longitude, coords.latitude, color='blue', alpha = 0.2)
     plt.fill(coords2.longitude, coords2.latitude, color='orange', alpha = 0.2)
-    plt.fill(df3.longitude, df3.latitude, color='green', alpha = 0.4)
+    if len(intersects) > 0:   
+        plt.fill(df3.longitude, df3.latitude, color='green', alpha = 0.4)
+    else:
+        print ("There is no area that allow you both to get to work on time, please get a new job")
     plt.show()
         
 
