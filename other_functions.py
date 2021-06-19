@@ -39,7 +39,6 @@ def main():
     max_time = input("what's the max amount of time either of you want to travel for? ")
     get_time_and_distance(originLong, originLat, origin2Long, origin2Lat, destinationLong, destinationLat, transport, max_time)
 
-main()
 
 def isochrone(auth_key=key):
     url = f'https://dev.virtualearth.net/REST/v1/Routes/Isochrones?waypoint=51.5072,-0.1353&maxtime=25&timeUnit=minute&travelMode=Walking&key={auth_key}'
@@ -71,4 +70,3 @@ def isochrone(auth_key=key):
     plt.fill_between(df2.longitude, df2.latitude, color='orange', alpha = 0.1)
     plt.show()
 
-#isochrone()
