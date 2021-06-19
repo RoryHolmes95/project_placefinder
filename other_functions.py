@@ -1,6 +1,7 @@
 import requests
 import json
 import matplotlib.pyplot as plt
+import pandas as pdd
 
 key = "AujNTOdwhaMihu2M2fT38-KQ_9rg26JFnhn-kE5S20BUTZlJ1uNzoxU-mdt8bi2R"
 
