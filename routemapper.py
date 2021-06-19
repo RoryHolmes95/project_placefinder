@@ -13,12 +13,12 @@ class Point:
 		self.x = x
 		self.y = y
 
-def get_union(auth_key=key):
-    url = f'https://dev.virtualearth.net/REST/v1/Routes/Isochrones?waypoint=51.563480,-0.184846&maxtime=25&timeUnit=minute&travelMode=Walking&key={auth_key}'
+def get_union(loc1, loc2, transportType, travelTime, auth_key=key):
+    url = f'https://dev.virtualearth.net/REST/v1/Routes/Isochrones?waypoint={loc1}&maxtime={travelTime}&timeUnit=minute&travelMode={transportType}&key={auth_key}'
     response = requests.get(url).content
     response = json.loads(response)
     coords = response['resourceSets'][0]['resources'][0]['polygons'][0]['coordinates'][0]
-    url2 = f'https://dev.virtualearth.net/REST/v1/Routes/Isochrones?waypoint=51.5287,-0.1528&maxtime=25&timeUnit=minute&travelMode=Walking&key={auth_key}'
+    url2 = f'https://dev.virtualearth.net/REST/v1/Routes/Isochrones?waypoint={loc2}&maxtime={travelTime}&timeUnit=minute&travelMode={transportType}&key={auth_key}'
     response2 = requests.get(url2).content
     response2 = json.loads(response2)
     coords2 = response2['resourceSets'][0]['resources'][0]['polygons'][0]['coordinates'][0]
@@ -63,7 +63,7 @@ def get_union(auth_key=key):
     ax.plot(coords2.longitude, coords2.latitude)
     if len(intersects) > 0:   
         ax.plot(df3.longitude, df3.latitude, color = 'green')
-    ax.set_title('25 minute walk radius from Pimlico and Leicester Square')
+    ax.set_title(f'{travelTime} minute {transportType} radius from Pimlico and Leicester Square')
     ax.set_xlim(-0.2107,-0.0498)
     ax.set_ylim(51.4768,51.5511)
     lims = (-0.2107, -0.0498, 51.4768, 51.5511,)
@@ -77,4 +77,4 @@ def get_union(auth_key=key):
     plt.show()
         
 
-get_union()
+get_union("51.507711,-0.169941", "51.487395,-0.169598", "Walking", 20)
