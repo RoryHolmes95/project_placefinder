@@ -3,7 +3,7 @@ import requests
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
-from shapely.geometry import Point
+from shapely.geometry import Point, Polygon
 import polygon_functions
 import other_functions
 
@@ -17,8 +17,6 @@ class Point:
 def get_union(postcode1, postcode2, transportType, travelTime, auth_key=key):
     loc1 = str(other_functions.get_location(postcode1.replace(" ",""))).replace(" ","").replace("(","").replace(")","")
     loc2 = str(other_functions.get_location(postcode2.replace(" ",""))).replace(" ","").replace("(","").replace(")","")
-    print (loc1)
-    print (loc2)
     url = f'https://dev.virtualearth.net/REST/v1/Routes/Isochrones?waypoint={loc1}&maxtime={travelTime}&timeUnit=minute&travelMode={transportType}&key={auth_key}'
     response = requests.get(url).content
     response = json.loads(response)
@@ -59,13 +57,21 @@ def get_union(postcode1, postcode2, transportType, travelTime, auth_key=key):
         df3 = df3.append(rows_between)
     if len(intersects) > 0:   
         df3 = df3.append(coords2.iloc[intersects2[-1]:intersects2[0]])
+        latitude = (df3['latitude'].to_list())
+        longitude = (df3['longitude'].to_list())
+        poly = zip(latitude, longitude)
+        polygon = Polygon(poly)
+        centroid = (polygon.centroid)
+        locality = other_functions.get_postcode(f"{centroid.x},{centroid.y}")
+        print (f"Based on your inputs, we suggest you look for housing in {locality}")
+        print (locality)
     mymap = plt.imread('map11.png')
     fig, ax = plt.subplots(figsize = (8,7))
     ax.plot(coords.longitude, coords.latitude)
     ax.plot(coords2.longitude, coords2.latitude)
     if len(intersects) > 0:   
         ax.plot(df3.longitude, df3.latitude, color = 'green')
-    ax.set_title(f'{travelTime} minute {transportType} radius from {postcode1} and {postcode2}')
+    ax.set_title(f'{travelTime} minute {transportType} radius from {postcode1} and {postcode2}. \n We suggest you look for housing in {locality}')
     ax.set_xlim(-0.2107,-0.0498)
     ax.set_ylim(51.4768,51.5511)
     lims = (-0.2107, -0.0498, 51.4768, 51.5511,)
@@ -79,4 +85,4 @@ def get_union(postcode1, postcode2, transportType, travelTime, auth_key=key):
     plt.show()
         
 
-get_union("SE1 0BE", "SE11 5PG", "Walking", 20)
+get_union("W8 6UG", "SW3 4SR", "Walking", 30)

@@ -70,3 +70,10 @@ def isochrone(auth_key=key):
     plt.fill_between(df2.longitude, df2.latitude, color='orange', alpha = 0.1)
     plt.show()
 
+def get_postcode(point, auth_key=key):
+    url = f'http://dev.virtualearth.net/REST/v1/Locations/{point}?includeEntityTypes=Postcode1&key={auth_key}'
+    response = requests.get(url).content
+    response = json.loads(response)
+    return response['resourceSets'][0]['resources'][0]['address']['locality']
+
+#print (get_postcode("51.49535608216484,-0.1069115833092635"))
