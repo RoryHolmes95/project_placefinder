@@ -53,7 +53,7 @@ def get_union(postcodes, transportType, travelTime, auth_key=key):
         transport=transportType,
         auth_key=auth_key) for x in locs]
     responses = [requests.get(url) for url in urls]
-    print(responses)
+    #print(responses)
     contents = [json.loads(response.content) for response in responses]
     coordses0 = [pd.DataFrame(content['resourceSets'][0]['resources'][0]['polygons'][0]['coordinates'][0],columns=["latitude", "longitude"]) for content in contents]
 
@@ -65,6 +65,8 @@ def get_union(postcodes, transportType, travelTime, auth_key=key):
     df_combo_list = [None]*N_combos
     k = 0
     coordses = coordses0
+    origs = coordses
+    print (N_postcodes)
     while len(df_combo_list) == N_combos and k<N_postcodes:
         coordses_out = coordses
         df_combo_list = []
@@ -76,37 +78,43 @@ def get_union(postcodes, transportType, travelTime, auth_key=key):
     #output is N_postcodes coordinate dataframes
     #if all areas intersect, then output should be N dataframes that are roughly equivalent.
     #otherwise will output the best combination (eg if there's 3 postcodes, but there's no triple intersect, will return the double intersect areas in three dataframes)
-    print(coordses_out)
-    exit(-1)
+    #print(coordses_out)
+    #exit(-1)
     
-    if len(intersects1) > 0:   
-        df_combo = df_combo.append(df_coords2.iloc[intersects2[-1]:intersects2[0]])
-        latitude = (df_combo['latitude'].to_list())
-        longitude = (df_combo['longitude'].to_list())
-        centroid = Polygon(zip(latitude, longitude)).centroid
-        locality = other_functions.get_postcode(f"{centroid.x},{centroid.y}")
-        print (f"Based on your inputs, we suggest you look for housing in {locality}")
-        print (locality)
+    # if len(intersects1) > 0:   
+    #     df_combo = df_combo.append(df_coords2.iloc[intersects2[-1]:intersects2[0]])
+    #     latitude = (df_combo['latitude'].to_list())
+    #     longitude = (df_combo['longitude'].to_list())
+    #     centroid = Polygon(zip(latitude, longitude)).centroid
+    #     locality = other_functions.get_postcode(f"{centroid.x},{centroid.y}")
+    #     print (f"Based on your inputs, we suggest you look for housing in {locality}")
+    #     print (locality)
     mymap = plt.imread('map11.png')
     fig, ax = plt.subplots(figsize = (8,7))
-    ax.plot(df_coords1.longitude, df_coords1.latitude)
-    ax.plot(df_coords2.longitude, df_coords2.latitude)
-    if len(intersects1) > 0:   
-        ax.plot(df_combo.longitude, df_combo.latitude, color = 'green')
-        ax.set_title(f'{travelTime} minute {transportType} radius from {postcode1} and {postcode2}. \n We suggest you look for housing in {locality}')
-    else:
-        ax.set_title(f'{travelTime} minute {transportType} radius from {postcode1} and {postcode2}. \n There is no area that allow you both to get to work on time, try changing the above parameters')
-    ax.set_xlim(-0.2107,-0.0498)
-    ax.set_ylim(51.4768,51.5511)
+    # for each in origs:
+    #     ax.plot(each.longitude, each.latitude)
+    for each in df_combo_list:
+        print (each)
+        ax.plot(each.longitude, each.latitude)
+    # print (df_combo_list[0])
+    # ax.plot(df_combo_list[0].latitude, df_combo_list[0].longitude)
+    #ax.plot(df_coords2.longitude, df_coords2.latitude)
+    # if len(intersects1) > 0:   
+    #     ax.plot(df_combo.longitude, df_combo.latitude, color = 'green')
+    #     ax.set_title(f'{travelTime} minute {transportType} radius from {postcode1} and {postcode2}. \n We suggest you look for housing in {locality}')
+    # else:
+    #     ax.set_title(f'{travelTime} minute {transportType} radius from {postcode1} and {postcode2}. \n There is no area that allow you both to get to work on time, try changing the above parameters')
+    #ax.set_xlim(-0.2107,-0.0498)
+    #ax.set_ylim(51.4768,51.5511)
     lims = (-0.2107, -0.0498, 51.4768, 51.5511,)
     ax.imshow(mymap, extent = lims, aspect= 'equal')
-    plt.fill(df_coords1.longitude, df_coords1.latitude, color='blue', alpha = 0.2)
-    plt.fill(df_coords2.longitude, df_coords2.latitude, color='orange', alpha = 0.2)
-    if len(intersects1) > 0:   
-        plt.fill(df_combo.longitude, df_combo.latitude, color='green', alpha = 0.4)
-    else:
-        print ("There is no area that allow you both to get to work on time, please get a new job")
+    #plt.fill(df_coords1.longitude, df_coords1.latitude, color='blue', alpha = 0.2)
+    #plt.fill(df_coords2.longitude, df_coords2.latitude, color='orange', alpha = 0.2)
+    #if len(intersects1) > 0:   
+    #    plt.fill(df_combo.longitude, df_combo.latitude, color='green', alpha = 0.4)
+    #else:
+    #    print ("There is no area that allow you both to get to work on time, please get a new job")
     plt.show()
         
 
-get_union(["SE14QB", "SE1 0BE","SE1 5HG"],"Walking", 60)
+get_union(["SE14QB", "SE1 0BE","SE1 5HG"],"Walking", 30)
