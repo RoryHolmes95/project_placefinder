@@ -56,8 +56,9 @@ def get_union(postcodes, transportType, travelTime, auth_key=key):
     #print(responses)
     contents = [json.loads(response.content) for response in responses]
     coordses0 = [pd.DataFrame(content['resourceSets'][0]['resources'][0]['polygons'][0]['coordinates'][0],columns=["latitude", "longitude"]) for content in contents]
-
-    polygon_functions.generate_meshgrid(coordses0[0])
+    xx,yy = polygon_functions.generate_meshgrid(coordses0)
+    for coords in coordses0:
+        polygon_functions.generate_area(coords,xx,yy)
     exit(-1)
     #start loop through areas to get mutual intersection
     #sum to n-1 different intersects

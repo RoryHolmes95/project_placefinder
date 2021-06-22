@@ -1,6 +1,7 @@
 from matplotlib import path
 import numpy as np
 import matplotlib.pyplot as plt
+import math as m
 def onSegment(p, q, r):
 	if ( (q.x <= max(p.x, r.x)) and (q.x >= min(p.x, r.x)) and
 		(q.y <= max(p.y, r.y)) and (q.y >= min(p.y, r.y))):
@@ -67,16 +68,25 @@ def doIntersect(p1,q1,p2,q2):
 	# If none of the cases
 	return False
 
-def generate_meshgrid(coords):
-	print(coords)
-	p = path.Path(coords.values.tolist())  # square with legs length 1 and bottom left corner at the origin
-	x = np.arange(coords["longitude"].min(),coords["longitude"].max(),0.0001)
-	y = np.arange(coords["latitude"].max(),coords["latitude"].min(),-0.0001)
+def generate_meshgrid(coordses):
+	NN = 1000 #factor of how refined the grid is
+	min_x = min([coords["longitude"].min() for coords in coordses])
+	max_x = max([coords["longitude"].max() for coords in coordses])
+	min_y = min([coords["latitude"].min() for coords in coordses])
+	max_y = max([coords["latitude"].max() for coords in coordses])
+	dx = (max_y-min_y)/NN
+	dy = (max_y-min_y)/NN
+	x = np.arange(min_x,max_x,dx)
+	y = np.arange(max_y,min_y,(-1)*dy)
 	xx,yy = np.meshgrid(x,y)
+	return xx,yy
+
+def generate_area(coords,xx,yy):
+	print(coords)
+	p = path.Path(coords.values.tolist())
 	positions = np.vstack([yy.ravel(), xx.ravel()])
 	iscontained_1D = p.contains_points(np.transpose(positions))
 	iscontained_2D = np.reshape(iscontained_1D,xx.shape)
-	print(iscontained_2D)
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
 	ax.imshow(iscontained_2D, aspect='auto', cmap=plt.cm.gray, interpolation='nearest')
