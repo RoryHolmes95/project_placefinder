@@ -69,7 +69,7 @@ def doIntersect(p1,q1,p2,q2):
 	return False
 
 def generate_meshgrid(coordses):
-	NN = 1000 #factor of how refined the grid is
+	NN = 100 #factor of how refined the grid is
 	min_x = min([coords["longitude"].min() for coords in coordses])
 	max_x = max([coords["longitude"].max() for coords in coordses])
 	min_y = min([coords["latitude"].min() for coords in coordses])
@@ -82,13 +82,8 @@ def generate_meshgrid(coordses):
 	return xx,yy
 
 def generate_area(coords,xx,yy):
-	print(coords)
 	p = path.Path(coords.values.tolist())
 	positions = np.vstack([yy.ravel(), xx.ravel()])
 	iscontained_1D = p.contains_points(np.transpose(positions))
-	iscontained_2D = np.reshape(iscontained_1D,xx.shape)
-	fig = plt.figure()
-	ax = fig.add_subplot(111)
-	ax.imshow(iscontained_2D, aspect='auto', cmap=plt.cm.gray, interpolation='nearest')
-	plt.show()
+	iscontained_2D = np.reshape(iscontained_1D,xx.shape).astype(int)
 	return iscontained_2D

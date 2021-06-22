@@ -53,12 +53,20 @@ def get_union(postcodes, transportType, travelTime, auth_key=key):
         transport=transportType,
         auth_key=auth_key) for x in locs]
     responses = [requests.get(url) for url in urls]
-    #print(responses)
+    print(responses)
     contents = [json.loads(response.content) for response in responses]
     coordses0 = [pd.DataFrame(content['resourceSets'][0]['resources'][0]['polygons'][0]['coordinates'][0],columns=["latitude", "longitude"]) for content in contents]
+    #generate meshgrid that contains all the areas
     xx,yy = polygon_functions.generate_meshgrid(coordses0)
-    for coords in coordses0:
-        polygon_functions.generate_area(coords,xx,yy)
+    #plot each area on the combined meshgrid 
+    areas = [polygon_functions.generate_area(coords,xx,yy) for coords in coordses0]
+    #combine the values - number at each gridpoint show how many areas cover that point
+    combined_areas = sum(areas)
+    #plotting
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.imshow(combined_areas, aspect='auto', cmap=plt.cm.gray, interpolation='nearest')
+    plt.show()
     exit(-1)
     #start loop through areas to get mutual intersection
     #sum to n-1 different intersects
