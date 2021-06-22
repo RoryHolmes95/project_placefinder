@@ -64,3 +64,14 @@ def doIntersect(p1,q1,p2,q2):
 	# If none of the cases
 	return False
 
+def generate_meshgrid(coords):
+	print(coords)
+	p = path.Path(coords.values.tolist())  # square with legs length 1 and bottom left corner at the origin
+	x = np.arange(coords["longitude"].min(),coords["longitude"].max(),0.01)
+	y = np.arange(coords["latitude"].min(),coords["latitude"].max(),0.01)
+	xx,yy = np.meshgrid(x,y)
+	positions = np.vstack([yy.ravel(), xx.ravel()])
+	iscontained_1D = p.contains_points(np.transpose(positions))
+	iscontained_2D = np.reshape(iscontained_1D,xx.shape)
+	print(iscontained_2D)
+	return iscontained_2D
