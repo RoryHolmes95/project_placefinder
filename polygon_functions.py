@@ -68,12 +68,12 @@ def doIntersect(p1,q1,p2,q2):
 	# If none of the cases
 	return False
 
-def generate_meshgrid(coordses):
-	NN = 100 #factor of how refined the grid is
-	min_x = min([coords["longitude"].min() for coords in coordses])
-	max_x = max([coords["longitude"].max() for coords in coordses])
-	min_y = min([coords["latitude"].min() for coords in coordses])
-	max_y = max([coords["latitude"].max() for coords in coordses])
+def generate_meshgrid(coordses0):
+	NN = 100 #factor of how refined the grid is (NN=100~<1s, NN=1000~1min)
+	min_x = min(min([[coords["longitude"].min() for coords in coordses] for coordses in coordses0]))
+	max_x = max(max([[coords["longitude"].max() for coords in coordses] for coordses in coordses0]))
+	min_y = min(min([[coords["latitude"].min() for coords in coordses] for coordses in coordses0]))
+	max_y = max(max([[coords["latitude"].max() for coords in coordses] for coordses in coordses0]))
 	dx = (max_y-min_y)/NN
 	dy = (max_y-min_y)/NN
 	x = np.arange(min_x,max_x,dx)

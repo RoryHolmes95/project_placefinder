@@ -7,6 +7,7 @@ from shapely.geometry import Point, Polygon
 import polygon_functions
 import other_functions
 import itertools as it
+import time
 
 key = "AujNTOdwhaMihu2M2fT38-KQ_9rg26JFnhn-kE5S20BUTZlJ1uNzoxU-mdt8bi2R"
 
@@ -55,19 +56,26 @@ def get_union(postcodes, transportType, travelTime, auth_key=key):
     responses = [requests.get(url) for url in urls]
     print(responses)
     contents = [json.loads(response.content) for response in responses]
-    coordses0 = [pd.DataFrame(content['resourceSets'][0]['resources'][0]['polygons'][0]['coordinates'][0],columns=["latitude", "longitude"]) for content in contents]
+    polygonses = [content['resourceSets'][0]['resources'][0]['polygons'] for content in contents]
+    coordses0 = [[pd.DataFrame(polygon['coordinates'][0],columns=["latitude", "longitude"]) for polygon in polygons] for polygons in polygonses]
+    #coordses0 = [pd.DataFrame(content['resourceSets'][0]['resources'][0]['polygons'][0]['coordinates'][0],columns=["latitude", "longitude"]) for content in contents]
+
     #generate meshgrid that contains all the areas
+    t0 = time.time()
     xx,yy = polygon_functions.generate_meshgrid(coordses0)
     #plot each area on the combined meshgrid 
-    areas = [polygon_functions.generate_area(coords,xx,yy) for coords in coordses0]
+    areases = [[polygon_functions.generate_area(coords,xx,yy) for coords in coordses] for coordses in coordses0]
     #combine the values - number at each gridpoint show how many areas cover that point
-    combined_areas = sum(areas)
+    combined_areas = sum([sum(areas) for areas in areases])
+    t1 = time.time()
+    print("Time:"+str(t1-t0))
     #plotting
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.imshow(combined_areas, aspect='auto', cmap=plt.cm.gray, interpolation='nearest')
     plt.show()
     exit(-1)
+
     #start loop through areas to get mutual intersection
     #sum to n-1 different intersects
     N_postcodes = len(coordses0)
@@ -128,4 +136,4 @@ def get_union(postcodes, transportType, travelTime, auth_key=key):
     plt.show()
         
 
-get_union(["SE14QB", "SE1 0BE","SE1 5HG"],"Walking", 30)
+get_union(["SE14QB", "SE1 0BE","E14 4AD"],"Transit", 30)
